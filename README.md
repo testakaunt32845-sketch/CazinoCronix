@@ -1,2 +1,1602 @@
-# CazinoCronix
-Cazino Cronix
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cazino Cronix 5.1 — Админка, жалобы, управление пользователями</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Базовые стили (без изменений, как в предыдущей версии) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            transition: background 0.3s;
+        }
+
+        :root {
+            --bg-gradient: linear-gradient(145deg, #f0f2f5 0%, #e6e9f0 100%);
+            --surface: rgba(255, 255, 255, 0.8);
+            --surface-solid: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --accent: #8b5cf6;
+            --accent-glow: #a78bfa;
+            --border: rgba(0, 0, 0, 0.08);
+            --card-bg: #ffffff;
+            --shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.15), 0 5px 12px -4px rgba(0, 0, 0, 0.05);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        .dark-theme {
+            --bg-gradient: linear-gradient(145deg, #0f0f17 0%, #1a1a2a 100%);
+            --surface: rgba(30, 30, 46, 0.9);
+            --surface-solid: #252538;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --accent: #c4b5fd;
+            --accent-glow: #8b5cf6;
+            --border: rgba(255, 255, 255, 0.08);
+            --card-bg: #2d2d44;
+            --shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-app {
+            width: 100%;
+            max-width: 700px;
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 48px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .app-header {
+            padding: 24px 28px 12px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .version {
+            background: var(--surface-solid);
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .music-control {
+            background: var(--surface-solid);
+            border: 1px solid var(--border);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+            margin-left: 10px;
+        }
+        .music-control:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .balance-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 28px;
+            background: var(--surface-solid);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .balance-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .balance-display i {
+            color: gold;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .balance-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+        }
+
+        .action-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.deposit {
+            background: linear-gradient(145deg, #10b981, #059669);
+            color: white;
+            border: none;
+        }
+
+        .action-btn.withdraw {
+            background: linear-gradient(145deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 20px 28px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.02);
+        }
+
+        .nav-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 12px 18px;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            flex: 1 0 auto;
+            justify-content: center;
+        }
+
+        .nav-item i {
+            font-size: 1.1rem;
+            color: var(--accent);
+        }
+
+        .nav-item:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            transform: scale(1.02);
+        }
+
+        .nav-item:hover i {
+            color: white;
+        }
+
+        .content-area {
+            padding: 28px;
+            min-height: 380px;
+        }
+
+        .panel {
+            display: none;
+            animation: fade 0.2s ease;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        @keyframes fade {
+            from { opacity: 0.3; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 32px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 20px -10px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            background: var(--surface-solid);
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn-primary {
+            background: linear-gradient(145deg, var(--accent), #7c3aed);
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.2s;
+            box-shadow: 0 10px 18px -8px var(--accent);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 25px -8px var(--accent);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 14px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .transactions-list, .complaints-list, .users-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border-radius: 24px;
+            background: var(--surface-solid);
+            padding: 10px;
+        }
+
+        .tx-item, .complaint-item, .user-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .complaint-item:last-child, .tx-item:last-child, .user-item:last-child {
+            border-bottom: none;
+        }
+
+        .complaint-item button, .user-item button {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        .user-item button.unban {
+            background: var(--success);
+        }
+
+        .support-block {
+            text-align: center;
+        }
+
+        .support-block i {
+            font-size: 3rem;
+            color: #25a3f0;
+            margin-bottom: 15px;
+        }
+
+        hr {
+            border: 1px solid var(--border);
+            margin: 20px 0;
+        }
+
+        .mines-grid {
+            display: grid;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        .mine-cell {
+            aspect-ratio: 1;
+            background: var(--surface-solid);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 1.2rem;
+        }
+        .mine-cell.revealed-safe {
+            background: #10b981;
+            color: white;
+        }
+        .mine-cell.revealed-mine {
+            background: #ef4444;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 40px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid var(--accent);
+            box-shadow: var(--shadow);
+            color: var(--text-primary);
+        }
+        .modal-content h2 {
+            margin-bottom: 20px;
+        }
+        .modal-content p {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-app" id="app">
+        <!-- Шапка с музыкой -->
+        <div class="app-header">
+            <div class="logo">
+                <h1><i class="fas fa-dragon"></i> Cazino Cronix</h1>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="version">v5.1</span>
+                <div class="music-control" id="musicToggle">
+                    <i class="fas fa-music"></i> <span id="musicText">Вкл музыку</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Баланс и кнопки действий -->
+        <div class="balance-bar" id="balanceBar">
+            <div class="balance-display" id="balanceDisplay">
+                <i class="fas fa-coins"></i>
+                <span>0.00</span>
+            </div>
+            <div class="balance-actions" id="balanceActions" style="display: none;">
+                <button class="action-btn deposit" id="depositBtn"><i class="fas fa-arrow-down"></i> Пополнить</button>
+                <button class="action-btn withdraw" id="withdrawBtn"><i class="fas fa-arrow-up"></i> Вывести</button>
+            </div>
+        </div>
+
+        <!-- Меню навигации -->
+        <div class="nav-menu" id="navMenu" style="display: none;">
+            <div class="nav-item" data-panel="roulette"><i class="fas fa-dice"></i> Рулетка</div>
+            <div class="nav-item" data-panel="mines"><i class="fas fa-bomb"></i> Мины</div>
+            <div class="nav-item" data-panel="funx"><i class="fas fa-rocket"></i> FunX</div>
+            <div class="nav-item" data-panel="chicken"><i class="fas fa-drumstick-bite"></i> Курица</div>
+            <div class="nav-item" data-panel="transactions"><i class="fas fa-history"></i> История</div>
+            <div class="nav-item" data-panel="complaint"><i class="fas fa-exclamation-triangle"></i> Жалоба</div>
+            <!-- Пункт для админа -->
+            <div class="nav-item admin-only" data-panel="admin" style="display: none;"><i class="fas fa-shield-alt"></i> Админка</div>
+            <div class="nav-item" data-panel="settings"><i class="fas fa-cog"></i> Настройки</div>
+            <div class="nav-item" data-panel="support"><i class="fas fa-headset"></i> Поддержка</div>
+            <div class="nav-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Выход</div>
+        </div>
+
+        <!-- Контентные панели -->
+        <div class="content-area" id="contentArea">
+            <!-- Панель авторизации -->
+            <div class="panel active" id="authPanel">
+                <div class="card">
+                    <h2 style="margin-bottom: 20px;"><i class="fas fa-lock"></i> Вход / Регистрация</h2>
+                    <div class="form-group">
+                        <label>Логин</label>
+                        <input type="text" id="loginInput" placeholder="Ваш логин">
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль</label>
+                        <input type="password" id="passwordInput" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label>Email (необязательно)</label>
+                        <input type="email" id="emailInput" placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Телефон (необязательно)</label>
+                        <input type="tel" id="phoneInput" placeholder="+7 (999) 123-45-67">
+                    </div>
+                    <button class="btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Войти</button>
+                    <button class="btn-secondary" id="registerBtn"><i class="fas fa-user-plus"></i> Зарегистрироваться</button>
+                    <p style="margin-top: 15px; text-align: center;" id="authMessage"></p>
+                </div>
+            </div>
+
+            <!-- Панель пополнения -->
+            <div class="panel" id="depositPanel">
+                <div class="card">
+                    <h2><i class="fas fa-arrow-down"></i> Пополнение баланса</h2>
+                    <p class="form-group">Минимальная сумма: 1000.00</p>
+                    <div class="form-group">
+                        <label>Сумма пополнения</label>
+                        <input type="number" id="depositAmount" min="1000" step="100" value="1000">
+                    </div>
+                    <button class="btn-primary" id="confirmDepositBtn"><i class="fas fa-check"></i> Пополнить</button>
+                    <button class="btn-secondary" id="cancelDepositBtn">Отмена</button>
+                </div>
+            </div>
+
+            <!-- Панель вывода с данными карты и банком -->
+            <div class="panel" id="withdrawPanel">
+                <div class="card">
+                    <h2><i class="fas fa-arrow-up"></i> Вывод средств</h2>
+                    <p class="form-group">Минимальная сумма: 3500.00</p>
+                    <div class="form-group">
+                        <label>Сумма вывода</label>
+                        <input type="number" id="withdrawAmount" min="3500" step="100" value="3500">
+                    </div>
+                    <div class="form-group">
+                        <label>Номер карты</label>
+                        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                    </div>
+                    <div class="form-group">
+                        <label>Имя держателя</label>
+                        <input type="text" id="cardHolder" placeholder="IVAN IVANOV">
+                    </div>
+                    <div class="form-group" style="display: flex; gap: 10px;">
+                        <div style="flex:1">
+                            <label>Срок (ММ/ГГ)</label>
+                            <input type="text" id="cardExpiry" placeholder="MM/YY">
+                        </div>
+                        <div style="flex:1">
+                            <label>CVV</label>
+                            <input type="text" id="cardCvv" placeholder="123" maxlength="3">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Банк получателя</label>
+                        <select id="bankSelect">
+                            <option value="sber">Сбербанк</option>
+                            <option value="tinkoff">Тинькофф</option>
+                            <option value="alfa">Альфа-Банк</option>
+                            <option value="vtb">ВТБ</option>
+                            <option value="gazprom">Газпромбанк</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" id="confirmWithdrawBtn"><i class="fas fa-check"></i> Вывести</button>
+                    <button class="btn-secondary" id="cancelWithdrawBtn">Отмена</button>
+                </div>
+            </div>
+
+            <!-- Рулетка -->
+            <div class="panel" id="roulettePanel">
+                <div class="card">
+                    <h2><i class="fas fa-dice"></i> Рулетка</h2>
+                    <div class="form-group">
+                        <label>Ставка (мин 100)</label>
+                        <input type="number" id="rouletteBet" value="100" min="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Тип ставки</label>
+                        <select id="rouletteBetType">
+                            <option value="number">На число (1-15) - x8</option>
+                            <option value="small">Маленькие (1-7) - x2</option>
+                            <option value="big">Большие (8-15) - x2</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="rouletteNumberGroup">
+                        <label>Ваше число (1-15)</label>
+                        <input type="number" id="rouletteNumber" min="1" max="15" value="7">
+                    </div>
+                    <button class="btn-primary" id="playRouletteBtn"><i class="fas fa-play"></i> Сделать ставку</button>
+                    <div id="rouletteResult" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+
+            <!-- Мины -->
+            <div class="panel" id="minesPanel">
+                <div class="card">
+                    <h2><i class="fas fa-bomb"></i> Мины</h2>
+                    <div class="form-group">
+                        <label>Ставка (мин 100)</label>
+                        <input type="number" id="minesBet" value="100" min="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Сложность</label>
+                        <select id="minesLevel">
+                            <option value="5,3">Маленькое 5x5 (3 мины)</option>
+                            <option value="7,7">Среднее 7x7 (7 мин)</option>
+                            <option value="9,15">Большое 9x15 (15 мин)</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" id="startMinesBtn">Начать игру</button>
+                    <div id="minesGameArea" style="margin-top: 20px;"></div>
+                    <div id="minesInfo"></div>
+                </div>
+            </div>
+
+            <!-- FunX -->
+            <div class="panel" id="funxPanel">
+                <div class="card">
+                    <h2><i class="fas fa-rocket"></i> FunX</h2>
+                    <div class="form-group">
+                        <label>Ставка (мин 100)</label>
+                        <input type="number" id="funxBet" value="100" min="100">
+                    </div>
+                    <button class="btn-primary" id="startFunxBtn">Запустить</button>
+                    <div style="margin-top: 20px;">
+                        <p>Множитель: <span id="funxMultiplier">1.00</span></p>
+                        <button class="btn-secondary" id="funxCashoutBtn" disabled>Забрать (Cash Out)</button>
+                    </div>
+                    <div id="funxResult"></div>
+                </div>
+            </div>
+
+            <!-- Курица -->
+            <div class="panel" id="chickenPanel">
+                <div class="card">
+                    <h2><i class="fas fa-drumstick-bite"></i> Курица</h2>
+                    <div class="form-group">
+                        <label>Ставка (мин 100)</label>
+                        <input type="number" id="chickenBet" value="100" min="100">
+                    </div>
+                    <button class="btn-primary" id="startChickenBtn">Начать переход</button>
+                    <div id="chickenGameArea" style="margin-top: 20px;">
+                        <p>Шаг: <span id="chickenStep">0</span>/10</p>
+                        <p>Множитель: <span id="chickenMult">1.00</span></p>
+                        <button class="btn-secondary" id="chickenCashoutBtn" disabled>Забрать</button>
+                    </div>
+                    <div id="chickenResult"></div>
+                </div>
+            </div>
+
+            <!-- Транзакции -->
+            <div class="panel" id="transactionsPanel">
+                <div class="card">
+                    <h2><i class="fas fa-history"></i> История транзакций</h2>
+                    <div class="transactions-list" id="transactionsList"></div>
+                </div>
+            </div>
+
+            <!-- Панель жалобы (для всех) -->
+            <div class="panel" id="complaintPanel">
+                <div class="card">
+                    <h2><i class="fas fa-exclamation-triangle"></i> Подать жалобу</h2>
+                    <p>Опишите проблему. Администратор рассмотрит вашу жалобу.</p>
+                    <div class="form-group">
+                        <label>Текст жалобы</label>
+                        <textarea id="complaintText" placeholder="Подробно опишите ситуацию..."></textarea>
+                    </div>
+                    <button class="btn-primary" id="submitComplaintBtn">Отправить жалобу</button>
+                    <div id="complaintMessage" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+
+            <!-- Панель администратора (только для admin) -->
+            <div class="panel" id="adminPanel">
+                <div class="card">
+                    <h2><i class="fas fa-shield-alt"></i> Администрирование</h2>
+                    
+                    <h3>Жалобы пользователей</h3>
+                    <div class="complaints-list" id="complaintsList"></div>
+                    
+                    <hr>
+                    
+                    <h3>Зарегистрированные пользователи</h3>
+                    <div class="users-list" id="usersList"></div>
+                </div>
+            </div>
+
+            <!-- Настройки -->
+            <div class="panel" id="settingsPanel">
+                <div class="card">
+                    <h2><i class="fas fa-cog"></i> Настройки</h2>
+                    <div class="form-group">
+                        <label>Тема оформления</label>
+                        <select id="themeSelect">
+                            <option value="light">Светлая</option>
+                            <option value="dark">Тёмная</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" id="saveThemeBtn">Сохранить тему</button>
+                    <hr>
+                    <h3>Смена пароля</h3>
+                    <div class="form-group">
+                        <label>Текущий пароль</label>
+                        <input type="password" id="currentPass">
+                    </div>
+                    <div class="form-group">
+                        <label>Новый пароль</label>
+                        <input type="password" id="newPass">
+                    </div>
+                    <button class="btn-primary" id="changePassBtn">Изменить пароль</button>
+                </div>
+            </div>
+
+            <!-- Поддержка -->
+            <div class="panel" id="supportPanel">
+                <div class="card support-block">
+                    <i class="fab fa-telegram"></i>
+                    <h2>Техподдержка</h2>
+                    <p><i class="fab fa-telegram"></i> Telegram: @maximka7k</p>
+                    <p><i class="fas fa-envelope"></i> support@cazinocronix.com</p>
+                    <p><i class="fas fa-phone-alt"></i> +7 (999) 123-45-67</p>
+                    <img src="https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=300&h=120&fit=crop&auto=format" alt="support" style="width:100%; border-radius: 20px; margin-top: 20px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно пользовательского соглашения -->
+    <div class="modal" id="termsModal">
+        <div class="modal-content">
+            <h2><i class="fas fa-file-contract"></i> Пользовательское соглашение Cazino Cronix</h2>
+            <div style="max-height: 50vh; overflow-y: auto;">
+                <p><strong>1. Общие положения</strong><br>
+                - Настоящее Пользовательское соглашение регулирует порядок использования сайта и услуг Cazino Cronix.<br>
+                - Используя сайт и сервисы Cazino, пользователь подтверждает, что ознакомился с условиями и согласен с ними.<br>
+                - Пользователь обязуется соблюдать требования законодательства своей страны при использовании сервиса.</p>
+                <p><strong>2. Услуги и азартные игры</strong><br>
+                - Cazino Cronix предоставляет доступ к азартным играм и сопутствующим сервисам.<br>
+                - Азартные игры предполагают риск потерь. Участие возможно только для лиц, достигших минимального возраста, установленного законодательством страны проживания.<br>
+                - Cazino Cronix не гарантирует выигрыш и не несет ответственности за финансовые потери игроков.</p>
+                <p><strong>3. Регистрация и аккаунт</strong><br>
+                - Для доступа к услугам пользователь создаёт аккаунт, указывая достоверные персональные данные.<br>
+                - Пользователь несёт ответственность за сохранность данных доступа и обязуется не передавать их третьим лицам.<br>
+                - Cazino Cronix оставляет за собой право приостанавливать или блокировать аккаунт при подозрении на мошенничество, нарушение условий или требований законодательства.</p>
+                <p><strong>4. Пополнение счёта и выплаты</strong><br>
+                - Пользователь может пополнять счёт и совершать ставки в соответствии с доступными методами оплаты.<br>
+                - Все финансовые операции проводятся в указанных валютах и с удержанием комиссий, если таковые применимы.<br>
+                - Возврат средств не осуществляется. Все транзакции являются окончательными, если иное не предусмотрено действующим законодательством или отдельными правилами платежных систем.<br>
+                - В исключительных случаях (ошибка, технический сбой, требование органов власти) Cazino Cronix оставляет за собой право корректировать операции и проводить расследование перед принятием решения.</p>
+                <p><strong>5. Ответственность сторон</strong><br>
+                - Cazino Cronix предоставляет сервисы "как есть" и не даёт гарантий бесперебойной работы.<br>
+                - Cazino Cronix не несёт ответственность за косвенные убытки, в том числе упущенную выгоду.<br>
+                - Пользователь несёт ответственность за соблюдение правил честной игры и законодательных требований.</p>
+                <p><strong>6. Конфиденциальность и использование данных</strong><br>
+                - Персональные данные пользователей обрабатываются в соответствии с политикой конфиденциальности Cazino Cronix.<br>
+                - Данные могут использоваться для обеспечения работы сервиса, проверки личности, предотвращения мошенничества и выполнения правовых обязательств.<br>
+                - Cazino Cronix принимает меры по защите данных, но не может гарантировать абсолютную безопасность при передаче информации через интернет.</p>
+                <p><strong>7. Ограничение доступа и локальные запреты</strong><br>
+                - В странах, где азартные игры запрещены или ограничены законом, доступ к услугам Cazino Cronix может быть заблокирован.<br>
+                - Пользователь самостоятельно несёт ответственность за соблюдение местных правил и ограничений.</p>
+                <p><strong>8. Решение споров</strong><br>
+                - Все споры решаются путём переговоров между сторонами.<br>
+                - В случае невозможности достижения соглашения споры подлежат рассмотрению в соответствии с законодательством, указанным в дополнительных условиях Cazino Cronix.</p>
+                <p><strong>9. Изменение условий</strong><br>
+                - Cazino Cronix вправе вносить изменения в настоящее Соглашение. Обновлённая версия вступает в силу с момента публикации на сайте.<br>
+                - Продолжение использования сервиса после публикации изменений означает согласие с ними.</p>
+                <p><strong>10. Заключительные положения</strong><br>
+                - Если какое‑либо положение Соглашения признано недействительным, остальные положения остаются в силе.<br>
+                - Контактная информация для обращений и жалоб размещается на сайте Cazino Cronix.</p>
+                <p><strong>Важно:</strong> Азартные игры связаны с риском потерь. При появлении признаков игровой зависимости рекомендуется прекратить участие и обратиться за профессиональной помощью.</p>
+            </div>
+            <button class="btn-primary" id="acceptTermsBtn" style="margin-top: 20px;">Я принимаю условия</button>
+        </div>
+    </div>
+
+    <!-- Аудио для музыки и звуков -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        (function() {
+            // ---------- Константы и утилиты ----------
+            const STORAGE_KEY = 'cazino_cronix_users';
+            const CURRENT_USER_KEY = 'cazino_current_user';
+            const COMPLAINTS_KEY = 'cazino_complaints';
+
+            function uuidv4() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+
+            function simpleHash(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash |= 0;
+                }
+                return hash.toString(36);
+            }
+
+            function loadUsers() {
+                const data = localStorage.getItem(STORAGE_KEY);
+                return data ? JSON.parse(data) : {};
+            }
+
+            function saveUsers(users) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+            }
+
+            function loadComplaints() {
+                const data = localStorage.getItem(COMPLAINTS_KEY);
+                return data ? JSON.parse(data) : [];
+            }
+
+            function saveComplaints(complaints) {
+                localStorage.setItem(COMPLAINTS_KEY, JSON.stringify(complaints));
+            }
+
+            function getCurrentUser() {
+                return localStorage.getItem(CURRENT_USER_KEY);
+            }
+
+            function setCurrentUser(login) {
+                if (login) localStorage.setItem(CURRENT_USER_KEY, login);
+                else localStorage.removeItem(CURRENT_USER_KEY);
+            }
+
+            function currentUserData() {
+                const login = getCurrentUser();
+                if (!login) return null;
+                const users = loadUsers();
+                return users[login] || null;
+            }
+
+            function updateBalanceDisplay() {
+                const user = currentUserData();
+                const span = document.querySelector('#balanceDisplay span');
+                if (user) {
+                    span.innerText = user.balance.toFixed(2);
+                } else {
+                    span.innerText = '0.00';
+                }
+            }
+
+            function addTransaction(kind, amount, note = '') {
+                const login = getCurrentUser();
+                if (!login) return false;
+                const users = loadUsers();
+                const user = users[login];
+                if (!user) return false;
+                const before = user.balance || 0;
+                let after = before;
+                if (kind === 'deposit' || kind === 'game_win') {
+                    after = before + amount;
+                } else if (kind === 'withdraw' || kind === 'game_loss') {
+                    if (amount > before) return false;
+                    after = before - amount;
+                } else {
+                    return false;
+                }
+                user.balance = after;
+                const tx = {
+                    ts: new Date().toISOString(),
+                    kind, amount, before, after, note
+                };
+                if (!user.transactions) user.transactions = [];
+                user.transactions.push(tx);
+                if (user.transactions.length > 100) user.transactions.shift();
+                saveUsers(users);
+                updateBalanceDisplay();
+                return true;
+            }
+
+            function showMessage(text, isError = false, target = 'authMessage') {
+                const msg = document.getElementById(target);
+                if (msg) {
+                    msg.style.color = isError ? '#ef4444' : '#10b981';
+                    msg.innerText = text;
+                    setTimeout(() => msg.innerText = '', 3000);
+                } else {
+                    alert(text);
+                }
+            }
+
+            function showPanel(panelId) {
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                const panel = document.getElementById(panelId);
+                if (panel) panel.classList.add('active');
+            }
+
+            function applyTheme(theme) {
+                const app = document.getElementById('app');
+                if (theme === 'dark') {
+                    app.classList.add('dark-theme');
+                } else {
+                    app.classList.remove('dark-theme');
+                }
+            }
+
+            function loadTransactions() {
+                const user = currentUserData();
+                const listDiv = document.getElementById('transactionsList');
+                if (!user || !listDiv) return;
+                const txs = user.transactions || [];
+                listDiv.innerHTML = '';
+                if (txs.length === 0) {
+                    listDiv.innerHTML = '<p style="text-align:center; color: var(--text-secondary);">Нет транзакций</p>';
+                    return;
+                }
+                txs.slice().reverse().forEach(t => {
+                    const div = document.createElement('div');
+                    div.className = 'tx-item';
+                    div.innerHTML = `<span><strong>${new Date(t.ts).toLocaleString()}</strong> ${t.kind}</span>
+                                     <span>${t.amount.toFixed(2)} (до ${t.before.toFixed(2)} → после ${t.after.toFixed(2)})</span>
+                                     <small style="width:100%; color:var(--text-secondary);">${t.note || ''}</small>`;
+                    listDiv.appendChild(div);
+                });
+            }
+
+            // Функции для админки
+            function loadComplaintsList() {
+                const complaints = loadComplaints();
+                const listDiv = document.getElementById('complaintsList');
+                if (!listDiv) return;
+                listDiv.innerHTML = '';
+                if (complaints.length === 0) {
+                    listDiv.innerHTML = '<p style="text-align:center;">Нет жалоб</p>';
+                    return;
+                }
+                complaints.reverse().forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = 'complaint-item';
+                    div.innerHTML = `
+                        <div style="flex:1">
+                            <strong>${c.from}</strong> (${new Date(c.date).toLocaleString()}):<br>
+                            ${c.text}
+                        </div>
+                        <div>
+                            <button class="ban-user" data-login="${c.from}">Заблокировать</button>
+                            <button class="resolve-complaint" data-id="${c.id}">✓</button>
+                        </div>
+                    `;
+                    listDiv.appendChild(div);
+                });
+                document.querySelectorAll('.ban-user').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const login = e.target.dataset.login;
+                        banUser(login);
+                    });
+                });
+                document.querySelectorAll('.resolve-complaint').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.dataset.id;
+                        resolveComplaint(id);
+                    });
+                });
+            }
+
+            function loadUsersList() {
+                const users = loadUsers();
+                const listDiv = document.getElementById('usersList');
+                if (!listDiv) return;
+                listDiv.innerHTML = '';
+                Object.keys(users).forEach(login => {
+                    const user = users[login];
+                    const div = document.createElement('div');
+                    div.className = 'user-item';
+                    div.innerHTML = `
+                        <span><strong>${login}</strong> (ID: ${user.account_id.substring(0,8)}...) Баланс: ${user.balance.toFixed(2)}</span>
+                        <div>
+                            ${user.banned ? 
+                                `<button class="unban" data-login="${login}">Разблокировать</button>` : 
+                                `<button class="ban-user" data-login="${login}">Заблокировать</button>`}
+                        </div>
+                    `;
+                    listDiv.appendChild(div);
+                });
+                document.querySelectorAll('#usersList .ban-user').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const login = e.target.dataset.login;
+                        banUser(login);
+                    });
+                });
+                document.querySelectorAll('#usersList .unban').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const login = e.target.dataset.login;
+                        unbanUser(login);
+                    });
+                });
+            }
+
+            function banUser(login) {
+                const users = loadUsers();
+                if (users[login]) {
+                    users[login].banned = true;
+                    saveUsers(users);
+                    showMessage(`Пользователь ${login} заблокирован`, false, 'authMessage');
+                    // Обновить списки, если админка открыта
+                    loadComplaintsList();
+                    loadUsersList();
+                }
+            }
+
+            function unbanUser(login) {
+                const users = loadUsers();
+                if (users[login]) {
+                    users[login].banned = false;
+                    saveUsers(users);
+                    showMessage(`Пользователь ${login} разблокирован`, false, 'authMessage');
+                    loadUsersList();
+                }
+            }
+
+            function resolveComplaint(id) {
+                let complaints = loadComplaints();
+                complaints = complaints.filter(c => c.id !== id);
+                saveComplaints(complaints);
+                loadComplaintsList();
+            }
+
+            function refreshUI() {
+                const user = currentUserData();
+                const authPanel = document.getElementById('authPanel');
+                const navMenu = document.getElementById('navMenu');
+                const balanceActions = document.getElementById('balanceActions');
+                const adminItems = document.querySelectorAll('.admin-only');
+                if (user) {
+                    // Проверка и исправление флага admin для maximka7k
+                    if (getCurrentUser() === 'maximka7k' && !user.admin) {
+                        const users = loadUsers();
+                        users['maximka7k'].admin = true;
+                        saveUsers(users);
+                        user.admin = true;
+                    }
+
+                    if (user.banned) {
+                        setCurrentUser(null);
+                        refreshUI();
+                        showMessage('Ваш аккаунт заблокирован администратором', true);
+                        return;
+                    }
+                    authPanel.classList.remove('active');
+                    navMenu.style.display = 'flex';
+                    balanceActions.style.display = 'flex';
+                    // Показываем админский пункт, если пользователь admin
+                    adminItems.forEach(el => {
+                        if (user.admin) el.style.display = 'flex';
+                        else el.style.display = 'none';
+                    });
+                    showPanel('roulettePanel');
+                    document.getElementById('themeSelect').value = user.theme || 'dark';
+                    applyTheme(user.theme || 'dark');
+                    updateBalanceDisplay();
+                    loadTransactions();
+
+                    // Проверяем, принял ли пользователь соглашение
+                    if (!user.acceptedTerms) {
+                        document.getElementById('termsModal').classList.add('active');
+                    }
+                } else {
+                    authPanel.classList.add('active');
+                    navMenu.style.display = 'none';
+                    balanceActions.style.display = 'none';
+                    showPanel('authPanel');
+                    updateBalanceDisplay();
+                }
+            }
+
+            // ---------- Звуки ----------
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            let audioCtx = null;
+
+            function playSound(type) {
+                if (!audioCtx) {
+                    audioCtx = new AudioContext();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                if (type === 'win') {
+                    osc.frequency.value = 800;
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                } else if (type === 'lose') {
+                    osc.frequency.value = 200;
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'click') {
+                    osc.frequency.value = 600;
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                }
+            }
+
+            // ---------- Музыка ----------
+            const audio = document.getElementById('bgMusic');
+            const musicToggle = document.getElementById('musicToggle');
+            const musicText = document.getElementById('musicText');
+            let musicPlaying = false;
+
+            musicToggle.addEventListener('click', () => {
+                if (musicPlaying) {
+                    audio.pause();
+                    musicText.innerText = 'Вкл музыку';
+                } else {
+                    audio.play().catch(e => console.log('Аудио не воспроизвелось (нужно взаимодействие)', e));
+                    musicText.innerText = 'Выкл музыку';
+                }
+                musicPlaying = !musicPlaying;
+            });
+
+            // ---------- Инициализация и обработчики ----------
+            document.addEventListener('DOMContentLoaded', () => {
+                refreshUI();
+
+                // Логин
+                document.getElementById('loginBtn').addEventListener('click', () => {
+                    const login = document.getElementById('loginInput').value.trim();
+                    const pwd = document.getElementById('passwordInput').value;
+                    const users = loadUsers();
+                    const user = users[login];
+                    if (!user || user.password !== simpleHash(pwd)) {
+                        playSound('lose');
+                        showMessage('Неверный логин или пароль', true);
+                        return;
+                    }
+                    if (user.banned) {
+                        showMessage('Ваш аккаунт заблокирован', true);
+                        return;
+                    }
+                    setCurrentUser(login);
+                    refreshUI();
+                    playSound('win');
+                });
+
+                // Регистрация
+                document.getElementById('registerBtn').addEventListener('click', () => {
+                    const login = document.getElementById('loginInput').value.trim();
+                    const pwd = document.getElementById('passwordInput').value;
+                    const email = document.getElementById('emailInput').value;
+                    const phone = document.getElementById('phoneInput').value;
+                    if (!login || !pwd) {
+                        showMessage('Логин и пароль обязательны', true);
+                        return;
+                    }
+                    const users = loadUsers();
+                    if (users[login]) {
+                        showMessage('Пользователь уже существует', true);
+                        return;
+                    }
+                    // Особый логин администратора
+                    const isAdmin = (login === 'maximka7k');
+                    users[login] = {
+                        account_id: uuidv4(),
+                        password: simpleHash(pwd),
+                        email, phone,
+                        created_at: new Date().toISOString(),
+                        balance: 100.0,
+                        theme: 'dark',
+                        transactions: [],
+                        acceptedTerms: false,
+                        banned: false,
+                        admin: isAdmin
+                    };
+                    saveUsers(users);
+                    setCurrentUser(login);
+                    refreshUI();
+                    showMessage('Регистрация успешна!');
+                    playSound('win');
+                });
+
+                // Выход
+                document.getElementById('logoutBtn').addEventListener('click', () => {
+                    setCurrentUser(null);
+                    refreshUI();
+                });
+
+                // Навигация по панелям
+                document.querySelectorAll('[data-panel]').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        const panel = e.currentTarget.getAttribute('data-panel');
+                        showPanel(panel + 'Panel');
+                        if (panel === 'transactions') loadTransactions();
+                        if (panel === 'admin') {
+                            loadComplaintsList();
+                            loadUsersList();
+                        }
+                        playSound('click');
+                    });
+                });
+
+                // Кнопки пополнения/вывода
+                document.getElementById('depositBtn').addEventListener('click', () => {
+                    showPanel('depositPanel');
+                    playSound('click');
+                });
+                document.getElementById('withdrawBtn').addEventListener('click', () => {
+                    showPanel('withdrawPanel');
+                    playSound('click');
+                });
+                document.getElementById('cancelDepositBtn').addEventListener('click', () => {
+                    showPanel('roulettePanel');
+                    playSound('click');
+                });
+                document.getElementById('cancelWithdrawBtn').addEventListener('click', () => {
+                    showPanel('roulettePanel');
+                    playSound('click');
+                });
+
+                // Подтверждение пополнения
+                document.getElementById('confirmDepositBtn').addEventListener('click', () => {
+                    const user = currentUserData();
+                    if (!user) return;
+                    const amount = parseFloat(document.getElementById('depositAmount').value);
+                    if (isNaN(amount) || amount < 1000) {
+                        showMessage('Минимальная сумма пополнения 1000', true, 'authMessage');
+                        return;
+                    }
+                    if (addTransaction('deposit', amount, 'Пополнение через личный кабинет')) {
+                        showMessage('Баланс пополнен!', false, 'authMessage');
+                        showPanel('roulettePanel');
+                        updateBalanceDisplay();
+                        playSound('win');
+                    }
+                });
+
+                // Подтверждение вывода (с проверкой карты и банка)
+                document.getElementById('confirmWithdrawBtn').addEventListener('click', () => {
+                    const user = currentUserData();
+                    if (!user) return;
+                    const amount = parseFloat(document.getElementById('withdrawAmount').value);
+                    const cardNumber = document.getElementById('cardNumber').value.trim();
+                    const cardHolder = document.getElementById('cardHolder').value.trim();
+                    const cardExpiry = document.getElementById('cardExpiry').value.trim();
+                    const cardCvv = document.getElementById('cardCvv').value.trim();
+                    const bank = document.getElementById('bankSelect').selectedOptions[0].text;
+
+                    if (isNaN(amount) || amount < 3500) {
+                        showMessage('Минимальная сумма вывода 3500', true, 'authMessage');
+                        return;
+                    }
+                    if (user.balance < amount) {
+                        showMessage('Недостаточно средств', true, 'authMessage');
+                        return;
+                    }
+                    if (!cardNumber || !cardHolder || !cardExpiry || !cardCvv) {
+                        showMessage('Заполните все данные карты', true, 'authMessage');
+                        return;
+                    }
+                    const last4 = cardNumber.slice(-4);
+                    if (addTransaction('withdraw', amount, `Вывод на карту ****${last4}, банк ${bank}`)) {
+                        showMessage(`Вывод ${amount} на карту ****${last4} (${bank}) оформлен`, false, 'authMessage');
+                        showPanel('roulettePanel');
+                        updateBalanceDisplay();
+                        document.getElementById('cardNumber').value = '';
+                        document.getElementById('cardHolder').value = '';
+                        document.getElementById('cardExpiry').value = '';
+                        document.getElementById('cardCvv').value = '';
+                        playSound('win');
+                    }
+                });
+
+                // Сохранение темы
+                document.getElementById('saveThemeBtn').addEventListener('click', () => {
+                    const theme = document.getElementById('themeSelect').value;
+                    const login = getCurrentUser();
+                    if (!login) return;
+                    const users = loadUsers();
+                    users[login].theme = theme;
+                    saveUsers(users);
+                    applyTheme(theme);
+                    showMessage('Тема сохранена', false, 'authMessage');
+                    playSound('click');
+                });
+
+                // Смена пароля
+                document.getElementById('changePassBtn').addEventListener('click', () => {
+                    const curr = document.getElementById('currentPass').value;
+                    const newp = document.getElementById('newPass').value;
+                    const login = getCurrentUser();
+                    if (!login) return;
+                    const users = loadUsers();
+                    const user = users[login];
+                    if (user.password !== simpleHash(curr)) {
+                        showMessage('Неверный текущий пароль', true, 'authMessage');
+                        return;
+                    }
+                    user.password = simpleHash(newp);
+                    saveUsers(users);
+                    showMessage('Пароль изменён', false, 'authMessage');
+                    playSound('win');
+                });
+
+                // Принятие соглашения
+                document.getElementById('acceptTermsBtn').addEventListener('click', () => {
+                    const login = getCurrentUser();
+                    if (!login) return;
+                    const users = loadUsers();
+                    users[login].acceptedTerms = true;
+                    saveUsers(users);
+                    document.getElementById('termsModal').classList.remove('active');
+                    playSound('win');
+                });
+
+                // Отправка жалобы
+                document.getElementById('submitComplaintBtn').addEventListener('click', () => {
+                    const user = currentUserData();
+                    if (!user) return;
+                    const text = document.getElementById('complaintText').value.trim();
+                    if (!text) {
+                        showMessage('Введите текст жалобы', true, 'complaintMessage');
+                        return;
+                    }
+                    const complaints = loadComplaints();
+                    complaints.push({
+                        id: uuidv4(),
+                        from: getCurrentUser(),
+                        text: text,
+                        date: new Date().toISOString()
+                    });
+                    saveComplaints(complaints);
+                    document.getElementById('complaintText').value = '';
+                    showMessage('Жалоба отправлена администратору', false, 'complaintMessage');
+                    playSound('win');
+                });
+
+                // ---------- ИГРЫ ----------
+
+                // Рулетка
+                const betTypeSelect = document.getElementById('rouletteBetType');
+                const numberGroup = document.getElementById('rouletteNumberGroup');
+                betTypeSelect.addEventListener('change', () => {
+                    if (betTypeSelect.value === 'number') {
+                        numberGroup.style.display = 'block';
+                    } else {
+                        numberGroup.style.display = 'none';
+                    }
+                });
+
+                document.getElementById('playRouletteBtn').addEventListener('click', () => {
+                    const user = currentUserData();
+                    if (!user) return;
+                    const bet = parseFloat(document.getElementById('rouletteBet').value);
+                    const betType = betTypeSelect.value;
+                    let number = null;
+                    if (betType === 'number') {
+                        number = parseInt(document.getElementById('rouletteNumber').value);
+                        if (number < 1 || number > 15) {
+                            showMessage('Число от 1 до 15', true, 'authMessage');
+                            return;
+                        }
+                    }
+                    if (bet < 100 || isNaN(bet) || bet > user.balance) {
+                        showMessage('Некорректная ставка', true, 'authMessage');
+                        return;
+                    }
+
+                    const winNumber = Math.floor(Math.random() * 15) + 1;
+                    let win = false;
+                    let multiplier = 0;
+
+                    if (betType === 'number') {
+                        if (number === winNumber) {
+                            win = true;
+                            multiplier = 8;
+                        }
+                    } else if (betType === 'small') {
+                        if (winNumber >= 1 && winNumber <= 7) {
+                            win = true;
+                            multiplier = 2;
+                        }
+                    } else if (betType === 'big') {
+                        if (winNumber >= 8 && winNumber <= 15) {
+                            win = true;
+                            multiplier = 2;
+                        }
+                    }
+
+                    if (win) {
+                        const winAmount = bet * multiplier * 0.98;
+                        addTransaction('game_win', winAmount, `Рулетка выигрыш: ${betType} на число ${winNumber}`);
+                        document.getElementById('rouletteResult').innerHTML = `<p style="color:#10b981;">Выпало ${winNumber}. Вы выиграли ${winAmount.toFixed(2)} (x${multiplier})!</p>`;
+                        playSound('win');
+                    } else {
+                        addTransaction('game_loss', bet, `Рулетка проигрыш: ${betType} (выпало ${winNumber})`);
+                        document.getElementById('rouletteResult').innerHTML = `<p style="color:#ef4444;">Выпало ${winNumber}. Вы проиграли ${bet.toFixed(2)}.</p>`;
+                        playSound('lose');
+                    }
+                });
+
+                // Мины
+                let minesGame = { active: false, size: 5, minesCount: 3, mines: new Set(), revealed: new Set(), bet: 0, multiplier: 1 };
+
+                function renderMinesBoard() {
+                    const area = document.getElementById('minesGameArea');
+                    if (!minesGame.active) { 
+                        area.innerHTML = ''; 
+                        document.getElementById('minesInfo').innerHTML = ''; 
+                        return; 
+                    }
+                    const { size, mines, revealed } = minesGame;
+                    let html = `<div class="mines-grid" style="grid-template-columns: repeat(${size}, 1fr);">`;
+                    for (let r = 0; r < size; r++) {
+                        for (let c = 0; c < size; c++) {
+                            const key = `${r},${c}`;
+                            const isRevealed = revealed.has(key);
+                            const isMine = mines.has(key);
+                            let cellClass = 'mine-cell';
+                            if (isRevealed) {
+                                cellClass += isMine ? ' revealed-mine' : ' revealed-safe';
+                            }
+                            html += `<div class="${cellClass}" data-row="${r}" data-col="${c}">`;
+                            if (isRevealed) {
+                                html += isMine ? '💣' : '✔️';
+                            } else {
+                                html += '?';
+                            }
+                            html += '</div>';
+                        }
+                    }
+                    html += '</div>';
+                    area.innerHTML = html;
+
+                    document.querySelectorAll('#minesGameArea .mine-cell').forEach(cell => {
+                        cell.addEventListener('click', (e) => {
+                            if (!minesGame.active) return;
+                            const row = e.currentTarget.dataset.row;
+                            const col = e.currentTarget.dataset.col;
+                            const key = `${row},${col}`;
+                            if (minesGame.revealed.has(key)) return;
+                            minesGame.revealed.add(key);
+                            
+                            if (minesGame.mines.has(key)) {
+                                addTransaction('game_loss', minesGame.bet, `Мины: подрыв на (${row},${col})`);
+                                minesGame.active = false;
+                                renderMinesBoard();
+                                document.getElementById('minesInfo').innerHTML = '<p style="color:#ef4444;">💥 Вы подорвались! Проигрыш.</p>';
+                                playSound('lose');
+                            } else {
+                                const safeCells = minesGame.size * minesGame.size - minesGame.mines.size;
+                                const revealedCount = minesGame.revealed.size;
+                                minesGame.multiplier = 1 + revealedCount * 0.25;
+                                renderMinesBoard();
+                                
+                                const infoDiv = document.getElementById('minesInfo');
+                                infoDiv.innerHTML = `<p>Множитель: x${minesGame.multiplier.toFixed(2)} 
+                                    <button class="btn-secondary" id="cashoutMinesBtn" style="margin-top:0;">Забрать ${(minesGame.bet * minesGame.multiplier).toFixed(2)}</button>
+                                </p>`;
+                                
+                                document.getElementById('cashoutMinesBtn').addEventListener('click', function() {
+                                    if (!minesGame.active) return;
+                                    const win = minesGame.bet * minesGame.multiplier;
+                                    addTransaction('game_win', win, `Мины: забрал ${minesGame.revealed.size} клеток`);
+                                    minesGame.active = false;
+                                    renderMinesBoard();
+                                    document.getElementById('minesInfo').innerHTML = `<p style="color:#10b981;">✅ Вы забрали ${win.toFixed(2)}</p>`;
+                                    playSound('win');
+                                });
+                                
+                                if (revealedCount === safeCells) {
+                                    const win = minesGame.bet * minesGame.multiplier;
+                                    addTransaction('game_win', win, 'Мины: все клетки открыты');
+                                    minesGame.active = false;
+                                    renderMinesBoard();
+                                    document.getElementById('minesInfo').innerHTML = `<p style="color:#10b981;">🎉 Вы открыли все клетки! Выигрыш ${win.toFixed(2)}</p>`;
+                                    playSound('win');
+                                }
+                            }
+                        });
+                    });
+                }
+
+                document.getElementById('startMinesBtn').addEventListener('click', () => {
+                    const user = currentUserData();
+                    if (!user) return;
+                    const bet = parseFloat(document.getElementById('minesBet').value);
+                    if (bet < 100 || bet > user.balance) {
+                        showMessage('Некорректная ставка', true, 'authMessage');
+                        return;
+                    }
+                    const level = document.getElementById('minesLevel').value.split(',').map(Number);
+                    const size = level[0], minesCount = level[1];
+                    const mines = new Set();
+                    while (mines.size < minesCount) {
+                        const r = Math.floor(Math.random() * size);
+                        const c = Math.floor(Math.random() * size);
+                        mines.add(`${r},${c}`);
+                    }
+                    minesGame = { active: true, size, minesCount, mines, revealed: new Set(), bet, multiplier: 1 };
+                    renderMinesBoard();
+                    document.getElementById('minesInfo').innerHTML = '';
+                    playSound('click');
+                });
+
+                // FunX
+                let funxInterval = null;
+                document.getElementById('startFunxBtn').addEventListener('click', () => {
+                    if (funxInterval) clearInterval(funxInterval);
+                    const user = currentUserData();
+                    if (!user) return;
+                    const bet = parseFloat(document.getElementById('funxBet').value);
+                    if (bet < 100 || bet > user.balance) {
+                        showMessage('Некорректная ставка', true, 'authMessage');
+                        return;
+                    }
+                    addTransaction('game_loss', bet, 'FunX ставка');
+
+                    let mult = 1.0;
+                    const step = 0.05;
+                    const crashProbability = 0.2;
+                    document.getElementById('funxMultiplier').innerText = mult.toFixed(2);
+                    document.getElementById('funxCashoutBtn').disabled = false;
+                    document.getElementById('funxResult').innerHTML = '';
+
+                    funxInterval = setInterval(() => {
+                        if (Math.random() < crashProbability) {
+                            clearInterval(funxInterval);
+                            document.getElementById('funxCashoutBtn').disabled = true;
+                            document.getElementById('funxResult').innerHTML = '<p style="color:#ef4444;">💥 КРАШ! Вы проиграли ставку.</p>';
+                            playSound('lose');
+                            return;
+                        }
+
+                        mult = parseFloat((mult + step).toFixed(2));
+                        document.getElementById('funxMultiplier').innerText = mult.toFixed(2);
+
+                        if (mult >= 5.0) {
+                            clearInterval(funxInterval);
+                            document.getElementById('funxCashoutBtn').disabled = true;
+                            document.getElementById('funxResult').innerHTML = '<p style="color:#ef4444;">💥 КРАШ (лимит).</p>';
+                            playSound('lose');
+                        }
+                    }, 350);
+
+                    document.getElementById('funxCashoutBtn').onclick = () => {
+                        clearInterval(funxInterval);
+                        const win = bet * mult;
+                        addTransaction('game_win', win, `FunX cashout x${mult.toFixed(2)}`);
+                        document.getElementById('funxResult').innerHTML = `<p style="color:#10b981;">✅ Вы забрали ${win.toFixed(2)}</p>`;
+                        document.getElementById('funxCashoutBtn').disabled = true;
+                        playSound('win');
+                    };
+                });
+
+                // Курица
+                let chickenGame = { active: false, step: 0, bet: 0 };
+                document.getElementById('startChickenBtn').addEventListener('click', () => {
+                    const user = currentUserData();
+                    if (!user) return;
+                    const bet = parseFloat(document.getElementById('chickenBet').value);
+                    if (bet < 100 || bet > user.balance) {
+                        showMessage('Некорректная ставка', true, 'authMessage');
+                        return;
+                    }
+                    addTransaction('game_loss', bet, 'Курица ставка');
+                    chickenGame = { active: true, step: 0, bet };
+                    document.getElementById('chickenStep').innerText = '0';
+                    document.getElementById('chickenMult').innerText = '1.00';
+                    document.getElementById('chickenCashoutBtn').disabled = false;
+                    document.getElementById('chickenResult').innerHTML = '';
+                    playSound('click');
+                });
+
+                document.getElementById('chickenCashoutBtn').addEventListener('click', () => {
+                    if (!chickenGame.active) return;
+                    const mult = 1 + chickenGame.step * 0.2;
+                    const win = chickenGame.bet * mult;
+                    addTransaction('game_win', win, `Курица забрал на шаге ${chickenGame.step}`);
+                    chickenGame.active = false;
+                    document.getElementById('chickenResult').innerHTML = `<p style="color:#10b981;">✅ Забрано ${win.toFixed(2)}</p>`;
+                    document.getElementById('chickenCashoutBtn').disabled = true;
+                    playSound('win');
+                });
+
+                const chickenNextBtn = document.createElement('button');
+                chickenNextBtn.className = 'btn-secondary';
+                chickenNextBtn.innerText = 'Сделать шаг';
+                chickenNextBtn.style.marginTop = '10px';
+                document.getElementById('chickenGameArea').appendChild(chickenNextBtn);
+                chickenNextBtn.addEventListener('click', () => {
+                    if (!chickenGame.active) return;
+                    chickenGame.step++;
+                    const mult = 1 + chickenGame.step * 0.2;
+                    document.getElementById('chickenStep').innerText = chickenGame.step;
+                    document.getElementById('chickenMult').innerText = mult.toFixed(2);
+                    const risk = chickenGame.step * 0.09;
+                    if (Math.random() < risk) {
+                        document.getElementById('chickenResult').innerHTML = '<p style="color:#ef4444;">🚗 Курицу сбила машина!</p>';
+                        chickenGame.active = false;
+                        document.getElementById('chickenCashoutBtn').disabled = true;
+                        playSound('lose');
+                    } else if (chickenGame.step >= 10) {
+                        const win = chickenGame.bet * mult;
+                        addTransaction('game_win', win, 'Курица перешла дорогу');
+                        document.getElementById('chickenResult').innerHTML = `<p style="color:#10b981;">🎉 Переход успешен! Выигрыш ${win.toFixed(2)}</p>`;
+                        chickenGame.active = false;
+                        document.getElementById('chickenCashoutBtn').disabled = true;
+                        playSound('win');
+                    }
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
